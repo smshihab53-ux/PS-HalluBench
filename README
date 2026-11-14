@@ -52,52 +52,6 @@ The benchmark study evaluates the following ten models:
 9. Llama-3.2-3B-Instruct
 10. Mistral-Nemo-Instruct-2407
 
-Each model was evaluated on all 200 benchmark questions, producing 2,000 responses in total.
-
-## Evaluation Methodology
-
-The benchmark uses strict correctness against independently verified reference answers.
-
-- Each question is associated with an engineering reference answer.
-- Model responses are evaluated using category-specific grading criteria.
-- Two independent human evaluators graded the anonymized responses, with disagreements resolved through discussion.
-- Numerical and constraint-related references were checked using dedicated engineering calculations and solvers.
-- The primary benchmark evaluation was conducted without external tools, retrieval, or numerical solver access.
-
-The grading criteria and inference methodology are documented in `grading_rubric.md` and `inference_protocol.md`.
-
-## Supplementary Engineering-Grounding Experiments
-
-In addition to the primary benchmark, the study investigates two approaches to improving LLM reliability.
-
-**1. Numerical solver feedback**
-
-Forty standardized DG-placement scenarios are used to examine the effectiveness of iterative AC power-flow solver feedback. The experiments compare standalone LLM predictions, LLM-guided candidate evaluation, and solver-guided search baselines.
-
-**2. Verified network topology**
-
-The topology experiment examines whether providing verified network connectivity information improves LLM responses to questions involving standard IEEE test systems.
-
-The supplementary DG-placement questions are provided in `DG40_Questions_Separate_Files.zip`.
-
-## Results
-
-The ten evaluated models achieved **39.35% overall strict correctness** across the 2,000 benchmark responses.
-
-The results highlight particular difficulties in numerical reasoning, network topology, and operating-limit verification. Additional experiments demonstrate the potential benefits of integrating LLMs with verified engineering information and numerical solver feedback.
-
-Detailed category-level results, model comparisons, and engineering-grounding experiments are presented in the accompanying research paper.
-
-## Reproducibility
-
-Researchers can use the materials in this repository to:
-
-- Evaluate additional LLMs against the 200 benchmark questions.
-- Compare model responses with the provided reference answers.
-- Apply the category-specific grading rubric.
-- Examine the supplementary DG-placement scenarios.
-- Study hallucination-related failures in power-system engineering tasks.
-
 For evaluation consistency, researchers should document the prompt, model version, inference settings, and grading procedure used in their experiments.
 
 ## Citation
