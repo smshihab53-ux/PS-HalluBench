@@ -2,61 +2,99 @@
 
 ## Purpose
 
-Apply **binary strict correctness** to each model's final engineering conclusion, using the corresponding reference answer and the question's provided operating conditions. Reasoning traces are excluded from grading. Incorrect answers are not automatically labeled as hallucinations.
+Apply **binary strict correctness** to each model's final engineering conclusion using the corresponding reference answer and the question's provided operating conditions. Reasoning traces are excluded from grading. Incorrect answers are not automatically classified as hallucinations.
 
-These rules summarize the manuscript's published criteria. They do **not** reproduce the unpublished item-by-item answer key or resolve all possible ambiguous cases. Human adjudication records should document deviations or edge cases.
+This rubric summarizes the evaluation criteria described in the PS-HalluBench manuscript. Reference answers are provided separately in `PS_HalluBench_Benchmark_Reference_Answers.txt`.
 
-## Cross-category rules
+## Cross-Category Rules
 
-1. Grade the **final answer**, not private/intermediate reasoning text or the fluency of its explanation.
-2. Match the actual question's required output and verified reference. Where an item requires multiple findings, a response must satisfy the complete required answer.
-3. Mark unsupported extra violation claims incorrect for constraint questions; do not silently apply that same rule to categories that lack this requirement.
-4. An answer that abstains is correct **only** on items whose reference establishes that essential evidence is insufficient; otherwise it is an unjustified abstention.
-5. Record absent/incomplete final conclusions separately in raw logs where possible; they are incorrect under strict correctness unless the reference specifically calls for abstention.
-6. Resolve ambiguous responses through independent rating followed by documented adjudication.
+1. Grade the **final answer**, not intermediate reasoning traces or the fluency of its explanation.
+2. Compare the response against the question's required output and verified reference answer. Where multiple findings are required, the response must satisfy all required components.
+3. For constraint-verification questions, unsupported additional violation claims are incorrect.
+4. Abstention is correct only when the reference establishes that essential information is insufficient. Unjustified abstention on answerable questions is incorrect.
+5. Missing, incomplete, or incorrect final conclusions are graded as incorrect unless the reference explicitly requires recognition of insufficient information.
+6. Ambiguous responses are independently evaluated and resolved through adjudication.
 
-## 1. Numerical (NUM; 40 questions)
+## 1. Numerical Reasoning (NUM; 40 Questions)
 
-**Correct:** Operating-point numerical quantities are within the manuscript's **2% tolerance** of the verified reference, or, for DG-placement questions, the proposed bus set matches the verified optimal reference bus set **exactly**. Evaluate each item according to its reference task, including whether feasibility or infeasibility is the expected conclusion.
+**Correct:** Numerical operating-point quantities fall within the manuscript's **2% tolerance** of the verified reference answer. For DG-placement questions, the predicted bus set must exactly match the verified optimal reference bus set.
 
-**Incorrect:** Values beyond tolerance; wrong placement set; an unsupported optimality/infeasibility conclusion; or no answer to a sufficiently specified question.
+For questions requiring feasibility assessment, the response must correctly identify whether a feasible solution exists.
 
-**Example (illustrative only):** If the reference optimal DG bus is 6, `Bus 6` passes the exact-placement criterion; `Bus 3` fails. These illustrative labels are not a released benchmark item.
+**Incorrect:** Numerical values exceeding the accepted tolerance, incorrect DG-placement bus sets, unsupported feasibility or optimality conclusions, or failure to provide the required answer.
 
-**Clarification needed from original authoring protocol:** How is percentage error defined when a reference value is zero or negative? Do not introduce a new convention retroactively; publish the original rule if documented.
+**Example:** For a question with reference optimal DG bus 6, the answer `Bus 6` is correct, while `Bus 3` is incorrect.
 
-## 2. Topology (TOP; 40 questions)
+**Numerical tolerance clarification:** The manuscript specifies a 2% tolerance but does not establish a separate convention for zero-valued or negative reference quantities. Such cases should follow the original evaluation procedure rather than introducing a new tolerance convention retrospectively.
 
-**Correct:** The answer agrees with verified connectivity, branch relationships, network configurations, and any switching state specified for that question, whether the network data were directly provided or the item refers to a standard IEEE test system.
+## 2. Network Topology (TOP; 40 Questions)
 
-**Incorrect:** Incorrect or omitted required connections, invented branches, unsupported topology assumptions, or wrong switching interpretation.
+**Correct:** The response correctly identifies network connectivity, branch relationships, network configurations, and applicable switching states according to the verified reference.
 
-## 3. Constraint violations (CON; 40 questions)
+Questions may involve directly supplied network configurations or standard IEEE test systems.
 
-**Correct:** Identifies all required violated operating limits, the affected components, and violation types, without inventing additional violations. Some items require AC power-flow calculation before limit checking. These are **violation-identification** tasks, not optimization or corrective-setpoint selection tasks.
+**Incorrect:** Incorrect connections, missing required branches, fabricated connections, unsupported topology assumptions, or incorrect switching-state interpretations.
 
-**Incorrect:** Misses a required violation; reports one that does not exist; misidentifies the affected component or type; or gives a conclusion inconsistent with the verified operating state.
+## 3. Constraint Verification (CON; 40 Questions)
 
-## 4. False-premise (FPA; 40 questions)
+**Correct:** The response identifies all required operating-limit violations, including affected components and violation types, without reporting nonexistent violations.
 
-**Correct:** Assesses validity of the premise **and** gives the correct engineering conclusion. Reject an invalid premise; accept a valid premise when supported. A blanket rejection of all premises does not pass valid-premise items.
+Questions may require AC power-flow calculations to determine the operating state before checking constraints.
 
-**Incorrect:** Accepts a false premise, rejects a true premise, or draws an incorrect engineering conclusion even if the premise decision was correct.
+These are **violation-identification tasks**, not optimization or corrective-setpoint selection tasks.
 
-**Pending reference validation:** Cases `FPA_019` and `FPA_020` have a reported inconsistency between the supplied breaker state and the reference explanation. Adjudicate the reference before finalizing subtype-level claims.
+**Incorrect:** Missing a required violation, reporting a nonexistent violation, identifying an incorrect affected component, specifying an incorrect violation type, or reaching a conclusion inconsistent with the verified operating state.
 
-## 5. Abstention (ABF; 40 questions)
+## 4. False-Premise Acceptance (FPA; 40 Questions)
 
-**Correct:** For genuinely insufficient-information items, explicitly recognizes that an answer cannot be determined from the available evidence. For answerable items, provides the correct engineering conclusion.
+**Correct:** The response correctly assesses the validity of the question's underlying engineering premise and provides the correct engineering conclusion.
 
-**Incorrect:** Invents an answer when essential data are missing; or unnecessarily abstains when the supplied information is sufficient; or answers incorrectly when answerable.
+For invalid-premise questions, the model must recognize the incorrect assumption rather than accepting it as true.
 
-**Important:** The models were **not explicitly instructed to abstain**. The evaluation tests whether their output independently reflects evidence sufficiency.
+For valid-premise questions, the model must avoid unjustified rejection and provide the appropriate engineering conclusion.
 
-## Human rating and adjudication
+**Incorrect:** Accepting an invalid premise, rejecting a valid premise, or providing an incorrect engineering conclusion even when the premise is correctly classified.
 
-The manuscript reports two authors independently grading 2,000 model outputs. Initial judgments agreed on **1,957/2,000 (97.85%)**, with **Cohen's kappa = 0.9523**; **43** disagreements were resolved through discussion. This measures consistency in scoring responses against the references, not independent validity of the references themselves. Do not claim the graders were blinded unless the original procedure confirms that.
+**Reference verification note:** `FPA_019` and `FPA_020` have been flagged for a possible inconsistency between the specified breaker state and reference explanation. Their original network configurations and reference answers should be checked before treating these items as independently validated.
 
-## What this rubric is not
+## 5. Abstention and Evidence Insufficiency (ABS; 40 Questions)
 
-It is **not** the complete per-question answer key, proof of solution correctness, or a response-level annotation set. Those resources would be needed for full third-party verification.
+**Correct:** For questions with genuinely insufficient information, the response explicitly recognizes that the requested conclusion cannot be determined from the provided evidence.
+
+For answerable questions, the response must provide the correct engineering conclusion rather than abstaining.
+
+**Incorrect:** Providing unsupported conclusions when essential information is missing, unnecessarily abstaining when sufficient information is available, or providing an incorrect answer to an answerable question.
+
+**Evaluation note:** Abstention performance should be interpreted in the context of the exact system prompt used during inference. Any instructions related to information sufficiency or uncertainty must be disclosed in the accompanying inference protocol.
+
+## Human Rating and Adjudication
+
+Two authors independently evaluated the **2,000 anonymized model responses**, blinded to model identity, using the category-specific criteria.
+
+The manuscript reports:
+
+- **Initial agreement:** 1,957/2,000 responses (97.85%).
+- **Cohen's kappa:** 0.9523.
+- **Disagreements:** 43 responses, resolved through discussion.
+
+The reported agreement measures consistency between human evaluators when applying the grading criteria. It does not independently establish the validity of every reference answer.
+
+## Reference Answers and Reproducibility
+
+The repository contains the following materials:
+
+- `Benchmark.zip` — benchmark questions.
+- `PS_HalluBench_Benchmark_Reference_Answers.txt` — reference answers for the benchmark.
+- `System_Prompt` — released system prompt.
+- `inference_protocol.md` — inference settings and evaluation methodology.
+- `DG40_Questions_Separate_Files.zip` — supplementary DG-placement scenarios.
+
+Researchers evaluating additional models should use the original benchmark questions, corresponding reference answers, and category-specific grading rules.
+
+Differences in system prompts, model configurations, or grading procedures should be documented when comparing results.
+
+## Scope and Limitations
+
+This rubric defines the operational criteria for strict correctness. It does not provide independent mathematical proofs for every reference answer, response-level grading records, or a complete record of adjudication decisions.
+
+Strict correctness measures whether the model's engineering conclusion agrees with the verified reference. It does not establish that every incorrect response was caused by a distinct hallucination mechanism.
